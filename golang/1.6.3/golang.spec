@@ -57,42 +57,33 @@ Source0:        https://storage.googleapis.com/golang/go%{go_version}.src.tar.gz
 # go1.5 bootstrapping. The compiler is written in golang.
 BuildRequires:  golang > 1.4
 BuildRequires:  pcre-devel
+BuildRequires:  glibc-static
 %if 0%{?rhel} > 6 || 0%{?fedora} > 0
 BuildRequires:  hostname
 %else
 BuildRequires:  net-tools
 %endif
-# use the arch dependent path in the bootstrap
-Patch212:       golang-1.5-bootstrap-binary-path.patch
 
 Provides:       go = %{version}-%{release}
 Requires:       %{name}-bin
 Requires:       %{name}-src = %{version}-%{release}
 
-Patch0:         golang-1.2-verbose-build.patch
+#Patch0:         golang-1.2-verbose-build.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1038683
 Patch1:         golang-1.2-remove-ECC-p224.patch
 
-# disable TestGdbPython
-# https://github.com/golang/go/issues/11214
-Patch213:       go1.5beta1-disable-TestGdbPython.patch
-
-# disable  TestCloneNEWUSERAndRemapNoRootDisableSetgroups
-# this is not possible in the limitied build chroot
-Patch214:       go1.5beta2-disable-TestCloneNEWUSERAndRemapNoRootDisableSetgroups.patch
-
-# we had been just removing the zoneinfo.zip, but that caused tests to fail for users that 
-# later run `go test -a std`. This makes it only use the zoneinfo.zip where needed in tests.
-Patch215:       ./go1.5-zoneinfo_testing_only.patch
-
+# https://github.com/golang/go/issues/9605
+Patch2:			disable-flanky-CPU-profile-test1.6.patch
+Patch3:			disable-cpu-profile-test1.6.patch
+Patch4:			disable-test-trace-symbolize1.6.patch
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
 
 # RPM can't handle symlink -> dir with subpackages, so merge back
 Obsoletes:      %{name}-data < 1.1.1-4
 
-# go1.4 deprecates a few packages
+# emacs and vim subpackages no longer provided in 1.4.2
 Obsoletes:      %{name}-vim < 1.4
 Obsoletes:      emacs-%{name} < 1.4
 
@@ -106,29 +97,29 @@ Source102:      macros.golang
 %description
 %{summary}.
 
-%package       docs
-Summary:       Golang compiler docs
-Requires:      %{name} = %{version}-%{release}
-BuildArch:     noarch
-Obsoletes:     %{name}-docs < 1.1-4
+%package		docs
+Summary:		Golang compiler docs
+Requires:		%{name} = %{version}-%{release}
+BuildArch:		noarch
+Obsoletes:		%{name}-docs < 1.1-4
 
-%description   docs
+%description	docs
 %{summary}.
 
-%package       misc
-Summary:       Golang compiler miscellaneous sources
-Requires:      %{name} = %{version}-%{release}
-BuildArch:     noarch
+%package		misc
+Summary:		Golang compiler miscellaneous sources
+Requires:		%{name} = %{version}-%{release}
+BuildArch:		noarch
 
-%description   misc
+%description	misc
 %{summary}.
 
-%package       tests
-Summary:       Golang compiler tests for stdlib
-Requires:      %{name} = %{version}-%{release}
-BuildArch:     noarch
+%package		tests
+Summary:		Golang compiler tests for stdlib
+Requires:		%{name} = %{version}-%{release}
+BuildArch:		noarch
 
-%description   tests
+%description	tests
 %{summary}.
 
 %package        src
@@ -137,42 +128,42 @@ BuildArch:      noarch
 %description    src
 %{summary}
 
-%package        bin
-Summary:        Golang core compiler tools
-Requires:       go = %{version}-%{release}
+%package		bin
+Summary:		Golang core compiler tools
+Requires:		go = %{version}-%{release}
 # Pre-go1.5, all arches had to be bootstrapped individually, before usable, and
 # env variables to compile for the target os-arch.
 # Now the host compiler needs only the GOOS and GOARCH environment variables
 # set to compile for the target os-arch.
-Obsoletes:      %{name}-pkg-bin-linux-386 < 1.4.99
-Obsoletes:      %{name}-pkg-bin-linux-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-bin-linux-arm < 1.4.99
-Obsoletes:      %{name}-pkg-linux-386 < 1.4.99
-Obsoletes:      %{name}-pkg-linux-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-linux-arm < 1.4.99
-Obsoletes:      %{name}-pkg-darwin-386 < 1.4.99
-Obsoletes:      %{name}-pkg-darwin-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-windows-386 < 1.4.99
-Obsoletes:      %{name}-pkg-windows-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-plan9-386 < 1.4.99
-Obsoletes:      %{name}-pkg-plan9-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-freebsd-386 < 1.4.99
-Obsoletes:      %{name}-pkg-freebsd-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-freebsd-arm < 1.4.99
-Obsoletes:      %{name}-pkg-netbsd-386 < 1.4.99
-Obsoletes:      %{name}-pkg-netbsd-amd64 < 1.4.99
-Obsoletes:      %{name}-pkg-netbsd-arm < 1.4.99
-Obsoletes:      %{name}-pkg-openbsd-386 < 1.4.99
-Obsoletes:      %{name}-pkg-openbsd-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-bin-linux-386 < 1.4.99
+Obsoletes:		%{name}-pkg-bin-linux-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-bin-linux-arm < 1.4.99
+Obsoletes:		%{name}-pkg-linux-386 < 1.4.99
+Obsoletes:		%{name}-pkg-linux-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-linux-arm < 1.4.99
+Obsoletes:		%{name}-pkg-darwin-386 < 1.4.99
+Obsoletes:		%{name}-pkg-darwin-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-windows-386 < 1.4.99
+Obsoletes:		%{name}-pkg-windows-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-plan9-386 < 1.4.99
+Obsoletes:		%{name}-pkg-plan9-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-freebsd-386 < 1.4.99
+Obsoletes:		%{name}-pkg-freebsd-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-freebsd-arm < 1.4.99
+Obsoletes:		%{name}-pkg-netbsd-386 < 1.4.99
+Obsoletes:		%{name}-pkg-netbsd-amd64 < 1.4.99
+Obsoletes:		%{name}-pkg-netbsd-arm < 1.4.99
+Obsoletes:		%{name}-pkg-openbsd-386 < 1.4.99
+Obsoletes:		%{name}-pkg-openbsd-amd64 < 1.4.99
 
 Requires(post): %{_sbindir}/update-alternatives
 Requires(postun): %{_sbindir}/update-alternatives
 
 # We strip the meta dependency, but go does require glibc.
 # This is an odd issue, still looking for a better fix.
-Requires:       glibc
-Requires:       gcc
-%description    bin
+Requires:		glibc
+Requires:		gcc
+%description	bin
 %{summary}
 
 # Workaround old RPM bug of symlink-replaced-with-dir failure
@@ -186,10 +177,10 @@ for _,d in pairs({"api", "doc", "include", "lib", "src"}) do
 end
 
 %ifarch x86_64
-%package        shared
-Summary:        Golang shared object libraries
+%package		shared
+Summary:		Golang shared objects libraries
 
-%description    shared
+%description	shared
 %{summary}.
 %endif
 
@@ -200,17 +191,12 @@ Summary:        Golang shared object libraries
 #%patch0 -p1
 
 # remove the P224 curve
-#%patch1 -p1
+%patch1 -p1
 
-# use the arch dependent path in the bootstrap
-#%patch212 -p1
-
-# disable TestGdbPython
-#%patch213 -p1
-
-# disable TestCloneNEWUSERAndRemapNoRootDisableSetgroups
-#%patch214 -p1
-
+# disable flanky test
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
 %build
 # go1.5 bootstrapping. The compiler is written in golang.
 export GOROOT_BOOTSTRAP=%{goroot}
@@ -225,6 +211,7 @@ export GOROOT_FINAL=%{goroot}
 export GOHOSTOS=linux
 export GOHOSTARCH=%{gohostarch}
 
+# build for all (see http://golang.org/doc/install/source#environment)
 pushd src
 # use our gcc options for this build, but store gcc as default for compiler
 CFLAGS="$RPM_OPT_FLAGS" \
@@ -232,7 +219,7 @@ LDFLAGS="$RPM_LD_FLAGS" \
 CC="gcc" \
 CC_FOR_TARGET="gcc" \
 GOOS=linux \
-GOARCH=%{gohostarch} \
+GOARCH=${goarch} \
 	./make.bash --no-clean
 popd
 
@@ -374,7 +361,7 @@ fi
 %doc AUTHORS CONTRIBUTORS LICENSE PATENTS
 # VERSION has to be present in the GOROOT, for `go install std` to work
 %doc %{goroot}/VERSION
-%dir %{goroot}/doc
+%doc %{goroot}/doc
 %doc %{goroot}/doc/*
 
 # go files
@@ -393,8 +380,8 @@ fi
 %dir %{gopath}/src/bitbucket.org/
 %dir %{gopath}/src/code.google.com/
 %dir %{gopath}/src/code.google.com/p/
-%dir %{gopath}/src/golang.org
-%dir %{gopath}/src/golang.org/x
+%dir %{gopath}/src/golang.org/
+%dir %{gopath}/src/golang.org/x/
 
 
 # gdbinit (for gdb debugging)
@@ -427,37 +414,28 @@ fi
 %endif
 
 %changelog
-* Wed Sep 09 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5.1-0
-- update to go1.5.1
+* Tue Jun 30 2015 Tomas Hrcka <thrcka@redhat.com> - 1.4.2-9
+- Enable tests during build time
+- Disable building of *BSD sub packages
 
-* Thu Aug 27 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5-6
-- starting a shared object subpackage. This will be x86_64 only until upstream supports more arches shared objects.
+* Fri Jun 12 2015 Tomas Hrcka <thrcka@redhat.com> - 1.4.2-6
+- Resolves: rhbz#1206063
 
-* Thu Aug 27 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5-5
-- bz991759 gdb path fix
+* Fri May 08 2015 Lokesh Mandvekar <lsm5@redhat.com> - 1.4.2-4
+- Revert previous build
+- bring back non-linux and non-x86_64 subpackages
 
-* Wed Aug 26 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5-4
-- disable shared object until linux/386 is ironned out
-- including the test/ directory for tests
+* Mon May 04 2015 Lokesh Mandvekar <lsm5@redhat.com> - 1.4.2-3
+- update to 1.4.2 (iterative build)
+- remove non-linux and non-x86_64 subpackages
 
-* Tue Aug 25 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5-3
-- bz1256910 only allow the golang zoneinfo.zip to be used in tests
-- bz1166611 add golang.org/x directory
-- bz1256525 include stdlib shared object. This will let other libraries and binaries
-  build with `go build -buildmode=shared -linkshared ...` or similar.
+* Mon May 04 2015 Lokesh Mandvekar <lsm5@redhat.com> - 1.4.2-2
+- update to 1.4.2 (iterative build)
+- emacs and vim subpackages obsoleted as they're no longer provided
 
-* Sun Aug 23 2015 Peter Robinson <pbrobinson@fedoraproject.org> 1.5-2
-- Enable aarch64
-- Minor cleanups
-
-* Thu Aug 20 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.5-1
-- updating to go1.5
-
-* Wed Aug 05 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.4.2-3
-- bz1250352
-
-* Wed Mar 18 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.4.2-2
-- obsoleting deprecated packages
+* Fri Apr 17 2015 Lokesh Mandvekar <lsm5@redhat.com> - 1.4.2-1
+- update to 1.4.2 - initial build
+- recompile CentOS7 virt SIG srpm for rhel7
 
 * Wed Feb 18 2015 Vincent Batts <vbatts@fedoraproject.org> - 1.4.2-1
 - updating to go1.4.2
@@ -493,50 +471,63 @@ fi
 * Mon Sep 29 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3.2-1
 - update to go1.3.2 (bz1147324)
 
-* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-22
+* Thu Sep 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3.1-3
+- patching the tzinfo failure
+
+* Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
+* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3.1-1
+- update to go1.3.1
+
+* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-11
+- merged a line wrong
+
+* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-10
 - more work to get cgo.a timestamps to line up, due to build-env
-
-* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-21
-- touch cgo.a regardless
-
-* Wed Aug 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-20
-- rpm dependency ordering for %%post
-
-* Tue Aug 12 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-19
-- finally check for a Stale cgo in a %%post
-
-* Tue Aug 12 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-18
-- explicitly list all the files and directories for the packages trees
-
-* Tue Aug 12 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-17
-- explicitly list all the files and directories of the src tree, to preserve timestamps
-
-* Mon Aug 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-16
+- explicitly list all the files and directories for the source and packages trees
 - touch all the built archives to be the same
 
-* Mon Aug 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-15
+* Mon Aug 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-9
 - make golang-src 'noarch' again, since that was not a fix, and takes up more space
 
-* Mon Aug 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-14
+* Mon Aug 11 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-8
 - update timestamps of source files during %%install bz1099206
 
-* Fri Aug 08 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-13
+* Fri Aug 08 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-7
 - update timestamps of source during %%install bz1099206
 
-* Fri Aug 08 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-12
-- set another version constraint on xemacs due to bz1127518
-
-* Wed Aug 06 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-11
-- set a version constraint on xemacs due to bz1127518
-
-* Wed Aug 06 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-10
+* Wed Aug 06 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-6
 - make the source subpackage arch'ed, instead of noarch
 
-* Tue Jul 15 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-9
+* Mon Jul 21 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-5
+- fix the writing of pax headers
+
+* Tue Jul 15 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-4
 - fix the loading of gdb safe-path. bz981356
 
-* Tue Jul 08 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.2.2-8
+* Tue Jul 08 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-3
 - `go install std` requires gcc, to build cgo. bz1105901, bz1101508
+
+* Mon Jul 07 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-2
+- archive/tar memory allocation improvements
+
+* Thu Jun 19 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3-1
+- update to go1.3
+
+* Fri Jun 13 2014 Vincent Batts <vbatts@fedoraproject.org> - 1.3rc2-1
+- update to go1.3rc2
+
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.3rc1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
+* Tue Jun 03 2014 Vincent Batts <vbatts@redhat.com> 1.3rc1-1
+- update to go1.3rc1
+- new arch file shuffling
+
+* Wed May 21 2014 Vincent Batts <vbatts@redhat.com> 1.3beta2-1
+- update to go1.3beta2
+- no longer provides go-mode for xemacs (emacs only)
 
 * Wed May 21 2014 Vincent Batts <vbatts@redhat.com> 1.2.2-7
 - bz1099206 ghost files are not what is needed
@@ -624,17 +615,23 @@ fi
 - Pull upstream patches for BZ#1010271
 - Add glibc requirement that got dropped because of meta dep fix
 
-* Thu Sep 19 2013 Adam Miller <maxamillion@fedoraproject.org> - 1.2.2-3
+* Fri Aug 30 2013 Adam Miller <maxamillion@fedoraproject.org> - 1.1.2-4
 - fix the libc meta dependency (thanks to vbatts [at] redhat.com for the fix)
 
-* Fri Aug 16 2013 Adam Miller <admiller@redhat.com> - 1.1.2-2
-- vim-filesystem only required for Fedora , vim-common owns those files in RHEL
+* Tue Aug 27 2013 Adam Miller <maxamillion@fedoraproject.org> - 1.1.2-3
+- Revert incorrect merged changelog
 
-* Fri Aug 16 2013 Adam Miller <admiller@redhat.com> - 1.1.2-1
+* Tue Aug 27 2013 Adam Miller <maxamillion@fedoraproject.org> - 1.1.2-2
+- This was reverted, just a placeholder changelog entry for bad merge
+
+* Tue Aug 20 2013 Adam Miller <maxamillion@fedoraproject.org> - 1.1.2-1
 - Update to latest upstream
 
-* Fri Aug 16 2013 Adam Miller <admiller@redhat.com> - 1.1.1-6
-- Remove xemacs bits for RHEL build
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.1-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
+* Wed Jul 17 2013 Petr Pisar <ppisar@redhat.com> - 1.1.1-6
+- Perl 5.18 rebuild
 
 * Wed Jul 10 2013 Adam Goode <adam@spicenitz.org> - 1.1.1-5
 - Blacklist testdata files from prelink
