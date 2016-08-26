@@ -47,7 +47,7 @@
 
 Name:           golang
 Version:        MAJOR_MINOR_PATCH
-Release:        0%{?dist}
+Release:        1%{?dist}
 Summary:        The Go Programming Language
 
 License:        BSD
@@ -72,6 +72,10 @@ Requires:       %{name}-src = %{version}-%{release}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1038683
 Patch1:         golang-1.7-remove-ECC-p224.patch
+
+# we had been just removing the zoneinfo.zip, but that caused tests to fail for users that 
+# later run `go test -a std`. This makes it only use the zoneinfo.zip where needed in tests.
+Patch215:       ./go1.5-zoneinfo_testing_only.patch
 
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
@@ -188,6 +192,8 @@ Summary:		Golang shared objects libraries
 
 # remove the P224 curve
 %patch1 -p1
+
+%patch215 -p1
 
 %build
 # go1.5 bootstrapping. The compiler is written in golang.
