@@ -47,7 +47,7 @@
 
 Name:           golang
 Version:        MAJOR_MINOR_PATCH
-Release:        1%{?dist}
+Release:        0%{?dist}
 Summary:        The Go Programming Language
 
 License:        BSD
