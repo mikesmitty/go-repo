@@ -1,1 +1,1 @@
-../1.7.3/golang.spec
+../1.8/golang.spec
