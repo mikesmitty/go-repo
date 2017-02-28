@@ -48,7 +48,7 @@
 
 Name:           golang
 Version:        MAJOR_MINOR_PATCH
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD and Public Domain
@@ -68,12 +68,13 @@ Provides:       go = %{version}-%{release}
 Provides:       go-srpm-macros
 Requires:       %{name}-bin
 Requires:       %{name}-src = %{version}-%{release}
-Requires:       %{name}-tests = %{version}-%{release}
 
 Patch0:         golang-1.2-verbose-build.patch
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1038683
 #Patch1:         golang-1.8beta2-remove-ECC-p224.patch
+
+Patch18:         go-1.8-chacha20.patch
 
 # use the arch dependent path in the bootstrap
 Patch212:       golang-1.5-bootstrap-binary-path.patch
@@ -211,6 +212,9 @@ Summary:        Golang shared object libraries
 
 # remove the P224 curve
 #%patch1 -p1
+
+# https://github.com/golang/go/commit/2fa09a20e56eb27f7cec635be42fc3137c091085
+%patch18 -p1
 
 # use the arch dependent path in the bootstrap
 #%patch212 -p1 -b .bootstrap
