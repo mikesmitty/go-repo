@@ -1,0 +1,12 @@
+diff -urBNs a/src/runtime/trace/trace_stack_test.go b/src/runtime/trace/trace_stack_test.go
+--- a/src/runtime/trace/trace_stack_test.go	2016-07-18 11:24:08.000000000 -0500
++++ b/src/runtime/trace/trace_stack_test.go	2016-07-27 20:32:07.100749550 -0500
+@@ -20,7 +20,7 @@
+ // TestTraceSymbolize tests symbolization and that events has proper stacks.
+ // In particular that we strip bottom uninteresting frames like goexit,
+ // top uninteresting frames (runtime guts).
+-func TestTraceSymbolize(t *testing.T) {
++func testTraceSymbolize(t *testing.T) {
+ 	testenv.MustHaveGoBuild(t)
+ 
+ 	buf := new(bytes.Buffer)

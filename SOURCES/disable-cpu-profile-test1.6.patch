@@ -1,0 +1,12 @@
+diff -urBNs a/src/runtime/pprof/pprof_test.go b/src/runtime/pprof/pprof_test.go
+--- a/src/runtime/pprof/pprof_test.go	2016-07-18 11:24:08.000000000 -0500
++++ b/src/runtime/pprof/pprof_test.go	2016-07-27 20:11:32.124426019 -0500
+@@ -362,7 +362,7 @@
+ 	})
+ }
+ 
+-func TestStackBarrierProfiling(t *testing.T) {
++func testStackBarrierProfiling(t *testing.T) {
+ 	if (runtime.GOOS == "linux" && runtime.GOARCH == "arm") || runtime.GOOS == "openbsd" || runtime.GOOS == "solaris" || runtime.GOOS == "dragonfly" || runtime.GOOS == "freebsd" {
+ 		// This test currently triggers a large number of
+ 		// usleep(100)s. These kernels/arches have poor

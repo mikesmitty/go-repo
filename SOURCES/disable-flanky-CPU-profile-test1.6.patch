@@ -1,0 +1,12 @@
+diff -urBNs a/src/runtime/pprof/pprof_test.go b/src/runtime/pprof/pprof_test.go
+--- a/src/runtime/pprof/pprof_test.go	2016-07-18 11:24:08.000000000 -0500
++++ b/src/runtime/pprof/pprof_test.go	2016-07-27 19:13:39.455600262 -0500
+@@ -73,7 +73,7 @@
+ 	})
+ }
+ 
+-func TestCPUProfileMultithreaded(t *testing.T) {
++func testCPUProfileMultithreaded(t *testing.T) {
+ 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(2))
+ 	testCPUProfile(t, []string{"runtime/pprof_test.cpuHog1", "runtime/pprof_test.cpuHog2"}, func(dur time.Duration) {
+ 		c := make(chan int)

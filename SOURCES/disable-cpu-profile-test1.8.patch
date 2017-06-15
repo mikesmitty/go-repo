@@ -1,0 +1,12 @@
+diff -urBNs a/src/runtime/pprof/pprof_test.go b/src/runtime/pprof/pprof_test.go
+--- a/src/runtime/pprof/pprof_test.go	2016-11-30 20:56:36.000000000 -0600
++++ b/src/runtime/pprof/pprof_test.go	2016-12-03 00:35:54.405749230 -0600
+@@ -383,7 +383,7 @@
+ 	return strings.Contains(config, "CONFIG_HIGH_RES_TIMERS=y")
+ }
+ 
+-func TestStackBarrierProfiling(t *testing.T) {
++func testStackBarrierProfiling(t *testing.T) {
+ 	if (runtime.GOOS == "linux" && runtime.GOARCH == "arm") ||
+ 		runtime.GOOS == "openbsd" ||
+ 		runtime.GOOS == "solaris" ||
