@@ -116,10 +116,6 @@ function buildTarget {
     # Update repo metadata
     createrepo --update $REPO_DIR/$dist/$vers/$arch/
     createrepo --update $REPO_DIR/$dist/$vers/Source/
-
-    if [ "$RELEASE" = "stable" ]; then
-        mock -r $CONFIG --clean
-    fi
 }
 
 echo Building package: $MAJOR_MINOR_PATCH
