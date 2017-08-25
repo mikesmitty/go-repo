@@ -3,6 +3,7 @@
 patch="$1"
 
 if [ -z "$patch" ]; then
+  echo "Patch filename required"
   exit 1
 fi
 

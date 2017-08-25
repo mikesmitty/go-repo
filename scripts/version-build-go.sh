@@ -96,13 +96,22 @@ function buildTarget {
     vers="$2"
     arch="$3"
 
+    if [ "$RELEASE" = "test" ]; then
+        POSTINSTALL="--postinstall"
+    fi
+
     # Build the rpms
     CONFIG="$dist-$vers-$arch"
     echo "Building RPMs for distro: $CONFIG"
-    mock -r $CONFIG --rebuild ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
+    mock -r $CONFIG --rebuild $POSTINSTALL ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
     
     if [ "$dist" = "epel" ]; then
         dist="centos"
+    fi
+
+    rpmCount=$(ls /var/lib/mock/$CONFIG/result/*.rpm |wc -l)
+    if [ "$RELEASE" != "test" ] && [ $rpmCount = 0 ]; then
+        return 1
     fi
 
     # Sign our packages and push them to the repo
