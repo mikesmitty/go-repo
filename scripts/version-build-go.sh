@@ -156,8 +156,8 @@ buildTarget "fedora" "25" "x86_64" || exit 2
 buildTarget "fedora" "25" "i386" || exit 2
 
 ## Fedora 24
-buildTarget "fedora" "24" "x86_64" || exit 2
-buildTarget "fedora" "24" "i386" || exit 2
+#buildTarget "fedora" "24" "x86_64" || exit 2
+#buildTarget "fedora" "24" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
