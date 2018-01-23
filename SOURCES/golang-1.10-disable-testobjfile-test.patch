@@ -1,0 +1,12 @@
+diff -urBNs a/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go b/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go
+--- a/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go	2017-12-07 12:33:02.000000000 -0600
++++ b/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go	2018-01-11 21:54:28.384107352 -0600
+@@ -199,7 +199,7 @@
+ 	}
+ }
+ 
+-func TestObjFile(t *testing.T) {
++func testObjFile(t *testing.T) {
+ 	skipUnlessLinuxAmd64(t)
+ 	bu := &Binutils{}
+ 	f, err := bu.Open(filepath.Join("testdata", "hello"), 0, math.MaxUint64, 0)
