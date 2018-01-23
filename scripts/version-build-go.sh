@@ -26,23 +26,23 @@ if [ "$BUILD_VERSION" == "false" ]; then
     fi
 fi
 
-PKG_URL="$(curl -s https://golang.org/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
-
-if [ -z "$PKG_URL" ]; then
-    echo Could not find tarball for version $BUILD_VERSION
-    exit 1
-fi
-
-FILE_NAME="$(echo $PKG_URL |egrep -o '[^/]+.src.tar.gz$')"
+FILE_NAME="go${BUILD_VERSION}.src.tar.gz"
 FILE_VERSION="$(echo $FILE_NAME |grep -oP '.+(?=.src.tar.gz)')"
 MAJOR_MINOR_PATCH="$(echo $FILE_VERSION |grep -oP '(?<=go).+')"
 MAJOR_MINOR="$(echo $MAJOR_MINOR_PATCH |egrep -o '[0-9]\.[0-9]+')"
 
 function getTarball {
-    echo Downloading package: $PKG_URL
     if [ ! -f $DOWNLOAD_DIR/$FILE_NAME ]; then
+        PKG_URL="$(curl -s https://golang.org/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
+        if [ -z "$PKG_URL" ]; then
+            echo Could not find tarball for version $BUILD_VERSION
+            exit 1
+        fi
+        
+        echo Downloading package: $PKG_URL
+
         wget -O $DOWNLOAD_DIR/$FILE_NAME "$PKG_URL"
-        return 0
+        return $?
     else
         echo "No new package to download, using cached tarball"
         return 0
@@ -117,7 +117,7 @@ function buildTarget {
     # Sign our packages and push them to the repo
     echo "Signing RPMs for distro: $CONFIG"
     signPackages "/var/lib/mock/$CONFIG/result/"
-    cp -nv /var/lib/mock/$CONFIG/result/*.rpm $REPO_DIR/$dist/$vers/$arch/
+    cp -nv /var/lib/mock/$CONFIG/result/*.rpm $REPO_DIR/$dist/$vers/$arch/ || return 1
 
     # Relocate our SRPMs
     mv $REPO_DIR/$dist/$vers/$arch/*.src.rpm $REPO_DIR/$dist/$vers/Source/
@@ -147,17 +147,13 @@ buildTarget "epel" "7" "x86_64" || exit 2
 buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
+# Fedora 27
+buildTarget "fedora" "27" "x86_64" || exit 2
+buildTarget "fedora" "27" "i386" || exit 2
+
 # Fedora 26
 buildTarget "fedora" "26" "x86_64" || exit 2
 buildTarget "fedora" "26" "i386" || exit 2
-
-# Fedora 25
-buildTarget "fedora" "25" "x86_64" || exit 2
-buildTarget "fedora" "25" "i386" || exit 2
-
-## Fedora 24
-#buildTarget "fedora" "24" "x86_64" || exit 2
-#buildTarget "fedora" "24" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
