@@ -95,15 +95,20 @@ function buildTarget {
     dist="$1"
     vers="$2"
     arch="$3"
+    opts="$4"
 
     if [ "$RELEASE" = "test" ]; then
-        POSTINSTALL="--postinstall"
+        MOCKOPTS="${MOCKOPTS} --postinstall"
+    fi
+
+    if [ "$opts" = "noclean" ]; then
+        MOCKOPTS="${MOCKOPTS} --no-clean"
     fi
 
     # Build the rpms
     CONFIG="$dist-$vers-$arch"
     echo "Building RPMs for distro: $CONFIG"
-    mock -r $CONFIG --rebuild $POSTINSTALL ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
+    mock -r $CONFIG --rebuild $MOCKOPTS ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
     
     if [ "$dist" = "epel" ]; then
         dist="centos"
@@ -148,12 +153,12 @@ buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
 # Fedora 27
-buildTarget "fedora" "27" "x86_64" || exit 2
-buildTarget "fedora" "27" "i386" || exit 2
+buildTarget "fedora" "27" "x86_64" "noclean" || exit 2
+buildTarget "fedora" "27" "i386" "noclean" || exit 2
 
 # Fedora 26
-buildTarget "fedora" "26" "x86_64" || exit 2
-buildTarget "fedora" "26" "i386" || exit 2
+buildTarget "fedora" "26" "x86_64" "noclean" || exit 2
+buildTarget "fedora" "26" "i386" "noclean" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
