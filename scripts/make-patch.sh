@@ -8,4 +8,4 @@ if [ -z "$patch" ]; then
 fi
 
 cd ~/patch-build/
-diff -urBNs a/ b/ |grep -v 'are identical' >$patch
+diff -urBN a/ b/ >$patch
