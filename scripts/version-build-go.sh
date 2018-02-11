@@ -4,11 +4,28 @@
 # One of these days I may rewrite this in something other than bash. Maybe.
 
 BUILD_VERSION=${1:-"false"}
-RELEASE=${2:-"stable"}
+RELEASE=${2:-"false"}
 
 DOWNLOAD_DIR="$HOME/download"
 BUILD_DIR="$HOME/rpmbuild"
 SPEC_REPO="$HOME/repo"
+
+if [ "$BUILD_VERSION" == "false" ]; then
+    BUILD_VERSION="$(curl -s https://golang.org/ |grep -oPm1 '(?<=Build version go)[0-9.]+(?=\.)')"
+    if [ -f $HOME/repo/SRPMS/golang-${BUILD_VERSION}-*.src.rpm ]; then
+        echo Go $BUILD_VERSION appears to be already built. Exiting.
+        exit 1
+    fi
+fi
+
+# Direct the build to the correct repo if unspecified
+if [ "$RELEASE" = "false" ]; then
+    if echo "$BUILD_VERSION" | egrep -q '^[0-9.]+$'; then
+        RELEASE="stable"
+    else
+        RELEASE="unstable"
+    fi
+fi
 
 if [ "$RELEASE" = "stable" ]; then
     REPO_DIR="/srv/go-repo"
@@ -16,14 +33,6 @@ elif [ "$RELEASE" = "unstable" ]; then
     REPO_DIR="/srv/unstable-go-repo"
 else
     REPO_DIR="$HOME/test-repo"
-fi
-
-if [ "$BUILD_VERSION" == "false" ]; then
-    BUILD_VERSION="$(curl -s https://golang.org/ |grep -oPm1 '(?<=Build version go)[0-9.]+(?=\.)')"
-    if [ -f $HOME/repo/SRPMS/golang-${BUILD_VERSION}-*.src.rpm ]; then
-        echo Golang $BUILD_VERSION appears to be already built. Exiting.
-        exit 1
-    fi
 fi
 
 FILE_NAME="go${BUILD_VERSION}.src.tar.gz"
