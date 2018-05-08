@@ -161,13 +161,16 @@ buildTarget "epel" "7" "x86_64" || exit 2
 buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
+# Fedora 28
+#buildTarget "fedora" "28" "x86_64" || exit 2
+
 # Fedora 27
-buildTarget "fedora" "27" "x86_64" || exit 2
-buildTarget "fedora" "27" "i386" || exit 2
+#buildTarget "fedora" "27" "x86_64" || exit 2
+#buildTarget "fedora" "27" "i386" || exit 2
 
 # Fedora 26
-buildTarget "fedora" "26" "x86_64" "noclean" || exit 2
-buildTarget "fedora" "26" "i386" "noclean" || exit 2
+#buildTarget "fedora" "26" "x86_64" || exit 2
+#buildTarget "fedora" "26" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
