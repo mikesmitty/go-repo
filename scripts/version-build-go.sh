@@ -9,8 +9,9 @@ RELEASE=${2:-"false"}
 DOWNLOAD_DIR="$HOME/download"
 BUILD_DIR="$HOME/rpmbuild"
 SPEC_REPO="$HOME/repo"
+DOCKER_MOUNT="/tmp/rpmbuild"
 
-if [ "$BUILD_VERSION" == "false" ]; then
+if [ "$BUILD_VERSION" = "false" ]; then
     BUILD_VERSION="$(curl -s https://golang.org/ |grep -oPm1 '(?<=Build version go)[0-9.]+(?=\.)')"
     if [ -f $HOME/repo/SRPMS/golang-${BUILD_VERSION}-*.src.rpm ]; then
         echo Go $BUILD_VERSION appears to be already built. Exiting.
@@ -61,6 +62,7 @@ function getTarball {
 function cleanBuildEnv {
     rm -rf $BUILD_DIR
     mkdir -p $BUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+    rm -fv $DOCKER_MOUNT/*.src.rpm
 }
 
 function buildSrcRpm {
@@ -114,24 +116,61 @@ function buildTarget {
         MOCKOPTS="${MOCKOPTS} --no-clean"
     fi
 
-    # Build the rpms
     CONFIG="$dist-$vers-$arch"
+    RESULT_DIR="/var/lib/mock/${CONFIG}/result"
+
+    # Build the rpms
     echo "Building RPMs for distro: $CONFIG"
     mock -r $CONFIG --rebuild $MOCKOPTS ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
-    
-    if [ "$dist" = "epel" ]; then
-        dist="centos"
+
+    postBuild "$@" "$RESULT_DIR" || return 1
+}
+
+function dockerBuildTarget {
+    dist="$1"
+    vers="$2"
+    arch="$3"
+    opts="$4"
+
+    if [ "$RELEASE" = "test" ]; then
+        MOCKOPTS="${MOCKOPTS} -e POST_INSTALL=true"
     fi
 
-    rpmCount=$(ls /var/lib/mock/$CONFIG/result/*.rpm |wc -l)
+    if [ "$opts" = "noclean" ]; then
+        MOCKOPTS="${MOCKOPTS} -e NO_CLEANUP=true"
+    fi
+
+    CONFIG="$dist-$vers-$arch"
+    RESULT_DIR="${DOCKER_MOUNT}/output/${CONFIG}"
+
+    # Build the rpms
+    echo "Building RPMs in docker for distro: $CONFIG"
+    SRC_RPM="$(basename $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm)"
+    docker run -it --cap-add=SYS_ADMIN -e MOCK_CONFIG=$CONFIG -e SOURCE_RPM=$SRC_RPM $MOCK_OPTS -v $DOCKER_MOUNT:/rpmbuild mock-rpmbuilder
+
+    postBuild "$@" "$RESULT_DIR" || return 1
+}
+
+function postBuild {
+    dist="$1"
+    vers="$2"
+    arch="$3"
+    opts="$4"
+    RESULT_DIR="$5"
+
+    rpmCount=$(ls $RESULT_DIR/*.rpm |wc -l)
     if [ "$RELEASE" != "test" ] && [ $rpmCount = 0 ]; then
         return 1
     fi
 
+    if [ "$dist" = "epel" ]; then
+        dist="centos"
+    fi
+
     # Sign our packages and push them to the repo
     echo "Signing RPMs for distro: $CONFIG"
-    signPackages "/var/lib/mock/$CONFIG/result/"
-    cp -nv /var/lib/mock/$CONFIG/result/*.rpm $REPO_DIR/$dist/$vers/$arch/ || return 1
+    signPackages "$RESULT_DIR/"
+    cp -nv $RESULT_DIR/*.rpm $REPO_DIR/$dist/$vers/$arch/ || return 1
 
     # Relocate our SRPMs
     mv $REPO_DIR/$dist/$vers/$arch/*.src.rpm $REPO_DIR/$dist/$vers/Source/
@@ -152,6 +191,7 @@ buildSrcRpm || exit 1
 
 echo -e "\nCopying source RPM to repo dir..."
 cp -fv $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm "$HOME/repo/SRPMS/"
+cp -fv $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm "$DOCKER_MOUNT/"
 
 # Binary rebuilds
 # CentOS 7
@@ -162,15 +202,15 @@ buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
 # Fedora 28
-#buildTarget "fedora" "28" "x86_64" || exit 2
+#dockerBuildTarget "fedora" "28" "x86_64" || exit 2
 
 # Fedora 27
-#buildTarget "fedora" "27" "x86_64" || exit 2
-#buildTarget "fedora" "27" "i386" || exit 2
+dockerBuildTarget "fedora" "27" "x86_64" || exit 2
+dockerBuildTarget "fedora" "27" "i386" || exit 2
 
 # Fedora 26
-#buildTarget "fedora" "26" "x86_64" || exit 2
-#buildTarget "fedora" "26" "i386" || exit 2
+dockerBuildTarget "fedora" "26" "x86_64" || exit 2
+dockerBuildTarget "fedora" "26" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
