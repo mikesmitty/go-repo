@@ -123,7 +123,7 @@ function buildTarget {
     echo "Building RPMs for distro: $CONFIG"
     mock -r $CONFIG --rebuild $MOCKOPTS ~/rpmbuild/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm
 
-    postBuild "$@" "$RESULT_DIR" || return 1
+    postBuild "$RESULT_DIR" "$@" || return 1
 }
 
 function dockerBuildTarget {
@@ -148,15 +148,15 @@ function dockerBuildTarget {
     SRC_RPM="$(basename $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm)"
     docker run -it --cap-add=SYS_ADMIN -e MOCK_CONFIG=$CONFIG -e SOURCE_RPM=$SRC_RPM $MOCK_OPTS -v $DOCKER_MOUNT:/rpmbuild mock-rpmbuilder
 
-    postBuild "$@" "$RESULT_DIR" || return 1
+    postBuild "$RESULT_DIR" "$@" || return 1
 }
 
 function postBuild {
-    dist="$1"
-    vers="$2"
-    arch="$3"
-    opts="$4"
-    RESULT_DIR="$5"
+    RESULT_DIR="$1"
+    dist="$2"
+    vers="$3"
+    arch="$4"
+    opts="$5"
 
     rpmCount=$(ls $RESULT_DIR/*.rpm |wc -l)
     if [ "$RELEASE" != "test" ] && [ $rpmCount = 0 ]; then
