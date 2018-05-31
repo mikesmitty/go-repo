@@ -146,7 +146,7 @@ function dockerBuildTarget {
     # Build the rpms
     echo "Building RPMs in docker for distro: $CONFIG"
     SRC_RPM="$(basename $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm)"
-    docker run -it --cap-add=SYS_ADMIN -e MOCK_CONFIG=$CONFIG -e SOURCE_RPM=$SRC_RPM $MOCK_OPTS -v $DOCKER_MOUNT:/rpmbuild mock-rpmbuilder
+    docker run -it --privileged=true -e MOCK_CONFIG=$CONFIG -e SOURCE_RPM=$SRC_RPM $MOCK_OPTS -v $DOCKER_MOUNT:/rpmbuild mock-rpmbuilder
 
     postBuild "$RESULT_DIR" "$@" || return 1
 }
