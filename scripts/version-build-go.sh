@@ -4,7 +4,7 @@
 # One of these days I may rewrite this in something other than bash. Maybe.
 
 BUILD_VERSION=${1:-"false"}
-RELEASE=${2:-"false"}
+UPLOAD=${2:-"false"}
 
 DOWNLOAD_DIR="$HOME/download"
 BUILD_DIR="$HOME/rpmbuild"
@@ -19,13 +19,11 @@ if [ "$BUILD_VERSION" = "false" ]; then
     fi
 fi
 
-# Direct the build to the correct repo if unspecified
-if [ "$RELEASE" = "false" ]; then
-    if echo "$BUILD_VERSION" | egrep -q '^[0-9.]+$'; then
-        RELEASE="stable"
-    else
-        RELEASE="unstable"
-    fi
+# Direct the build to the correct repo
+if echo "$BUILD_VERSION" | egrep -q '^[0-9.]+$'; then
+    RELEASE="stable"
+else
+    RELEASE="unstable"
 fi
 
 if [ "$RELEASE" = "stable" ]; then
@@ -219,8 +217,10 @@ dockerBuildTarget "fedora" "26" "i386" || exit 2
 #    gpg --detach-sign --armor $file
 #done
 
-echo -e "\nSkipping upload"
-exit
+if [ "$UPLOAD" = "false" ]; then
+    echo -e "\nSkipping upload"
+    exit
+fi
 
 # Upload to server
 if [ "$RELEASE" = "stable" ]; then
