@@ -1,0 +1,14 @@
+diff -urBN a/src/cmd/go/go_test.go b/src/cmd/go/go_test.go
+--- a/src/cmd/go/go_test.go	2018-04-30 16:27:15.000000000 -0500
++++ b/src/cmd/go/go_test.go	2018-06-04 23:53:55.741595858 -0500
+@@ -4138,7 +4138,9 @@
+ 
+ 	tg := testgo(t)
+ 	defer tg.cleanup()
+-	tg.parallel()
++	// Parallelizing this test can cause a race condition on override.h
++	// https://github.com/golang/go/issues/22584
++	//tg.parallel()
+ 	tg.tempFile("override.go", `package main
+ 
+ import "C"
