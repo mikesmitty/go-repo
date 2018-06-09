@@ -63,6 +63,8 @@ function cleanBuildEnv {
     rm -rf $BUILD_DIR
     mkdir -p $BUILD_DIR/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
     rm -fv $DOCKER_MOUNT/*.src.rpm
+    rm -fv $DOCKER_MOUNT/output/*/*.rpm
+    docker system prune --force
 }
 
 function buildSrcRpm {
@@ -216,6 +218,9 @@ dockerBuildTarget "fedora" "26" "i386" || exit 2
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
 #    gpg --detach-sign --armor $file
 #done
+
+echo -e "\nSkipping upload"
+exit
 
 # Upload to server
 if [ "$RELEASE" = "stable" ]; then

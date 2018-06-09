@@ -72,6 +72,7 @@ if [ ! -z "$SOURCE_RPM" ]; then
         echo "      OUTPUT_FOLDER:  $OUTPUT_FOLDER"
         echo "========================================================================"
         CMD="$MOCK_BIN $DEFINE_CMD -r $MOCK_CONFIG --rebuild $MOUNT_POINT/$SOURCE_RPM --resultdir=$OUTPUT_FOLDER"
+        POST_CMD="chmod g+w $OUTPUT_FOLDER/$MOCK_CONFIG $OUTPUT_FOLDER/$MOCK_CONFIG/*.rpm"
 
         if [ ! -z "$NO_CLEANUP" ]; then
           CMD="$CMD --no-clean"
@@ -81,6 +82,7 @@ if [ ! -z "$SOURCE_RPM" ]; then
         fi
 
         echo "$CMD" > $OUTPUT_FOLDER/script-test.sh
+        echo "$POST_CMD" >> $OUTPUT_FOLDER/script-test.sh
 elif [ ! -z "$SPEC_FILE" ]; then
         if [ -z "$SOURCES" ]; then
                 echo "You need to specify SOURCES env variable pointing to folder or sources file (only when building with SPEC_FILE)"
@@ -94,6 +96,7 @@ elif [ ! -z "$SPEC_FILE" ]; then
 
         SRPM_CMD="$MOCK_BIN $DEFINE_CMD -r $MOCK_CONFIG --buildsrpm --spec=$MOUNT_POINT/$SPEC_FILE --sources=$MOUNT_POINT/$SOURCES --resultdir=$OUTPUT_FOLDER"
         REBUILD_CMD="$MOCK_BIN $DEFINE_CMD -r $MOCK_CONFIG --rebuild \$(find $OUTPUT_FOLDER -type f -name \"*.src.rpm\") --resultdir=$OUTPUT_FOLDER"
+        POST_CMD="chmod g+w $OUTPUT_FOLDER/$MOCK_CONFIG $OUTPUT_FOLDER/$MOCK_CONFIG/*.rpm"
 
         if [ ! -z "$NO_CLEANUP" ]; then
           SRPM_CMD="$SRPM_CMD --no-cleanup-after"
@@ -105,6 +108,7 @@ elif [ ! -z "$SPEC_FILE" ]; then
 
         echo "$SRPM_CMD" > $OUTPUT_FOLDER/script-test.sh
         echo "$BUILD_CMD" >> $OUTPUT_FOLDER/script-test.sh
+        echo "$POST_CMD" >> $OUTPUT_FOLDER/script-test.sh
 fi
 
 chmod 755 $OUTPUT_FOLDER/script-test.sh
