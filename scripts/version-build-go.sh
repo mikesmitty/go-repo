@@ -9,7 +9,7 @@ UPLOAD=${2:-"false"}
 DOWNLOAD_DIR="$HOME/download"
 BUILD_DIR="$HOME/rpmbuild"
 SPEC_REPO="$HOME/repo"
-DOCKER_MOUNT="/tmp/rpmbuild"
+DOCKER_MOUNT="/srv/rpmbuild"
 
 if [ "$BUILD_VERSION" = "false" ]; then
     BUILD_VERSION="$(curl -s https://golang.org/ |grep -oPm1 '(?<=Build version go)[0-9.]+(?=\.)')"
@@ -202,15 +202,12 @@ buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
 # Fedora 28
-#dockerBuildTarget "fedora" "28" "x86_64" || exit 2
+dockerBuildTarget "fedora" "28" "x86_64" || exit 2
+dockerBuildTarget "fedora" "28" "i386" || exit 2
 
 # Fedora 27
 dockerBuildTarget "fedora" "27" "x86_64" || exit 2
 dockerBuildTarget "fedora" "27" "i386" || exit 2
-
-# Fedora 26
-dockerBuildTarget "fedora" "26" "x86_64" || exit 2
-dockerBuildTarget "fedora" "26" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
