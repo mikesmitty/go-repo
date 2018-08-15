@@ -1,0 +1,12 @@
+diff -urBN a/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go b/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go
+--- a/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go	2018-08-03 13:30:36.000000000 -0500
++++ b/src/cmd/vendor/github.com/google/pprof/internal/binutils/binutils_test.go	2018-08-03 20:24:18.281780115 -0500
+@@ -216,7 +216,7 @@
+ 	return nil
+ }
+ 
+-func TestObjFile(t *testing.T) {
++func testObjFile(t *testing.T) {
+ 	skipUnlessLinuxAmd64(t)
+ 	for _, tc := range []struct {
+ 		desc                 string
