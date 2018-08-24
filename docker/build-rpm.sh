@@ -72,7 +72,7 @@ if [ ! -z "$SOURCE_RPM" ]; then
         echo "      OUTPUT_FOLDER:  $OUTPUT_FOLDER"
         echo "========================================================================"
         CMD="$MOCK_BIN $DEFINE_CMD -r $MOCK_CONFIG --rebuild $MOUNT_POINT/$SOURCE_RPM --resultdir=$OUTPUT_FOLDER"
-        POST_CMD="chmod g+w $OUTPUT_FOLDER/$MOCK_CONFIG $OUTPUT_FOLDER/$MOCK_CONFIG/*.rpm"
+        POST_CMD="chmod g+w $OUTPUT_FOLDER/ $OUTPUT_FOLDER/*.rpm"
 
         if [ ! -z "$NO_CLEANUP" ]; then
           CMD="$CMD --no-clean"
