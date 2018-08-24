@@ -1,0 +1,12 @@
+diff -urBN a/src/os/exec/exec_test.go b/src/os/exec/exec_test.go
+--- a/src/os/exec/exec_test.go	2018-08-22 17:25:03.000000000 -0500
++++ b/src/os/exec/exec_test.go	2018-08-23 21:53:40.917364380 -0500
+@@ -534,7 +534,7 @@
+ 	c.Wait()
+ }
+ 
+-func TestExtraFiles(t *testing.T) {
++func testExtraFiles(t *testing.T) {
+ 	testenv.MustHaveExec(t)
+ 
+ 	if runtime.GOOS == "windows" {

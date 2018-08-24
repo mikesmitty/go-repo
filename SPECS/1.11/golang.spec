@@ -150,6 +150,9 @@ Patch215:       golang-1.10-zoneinfo_testing_only.patch
 
 Patch220:       golang-1.11-disable-testobjfile-test.patch
 
+# Fix for flaky TestExtraFiles test https://github.com/golang/go/issues/25628
+Patch221:       golang-1.11-disable-testextrafiles-test.patch
+
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
 
@@ -285,6 +288,8 @@ Requires:       %{name} = %{version}-%{release}
 #%patch219 -p1
 
 %patch220 -p1
+
+%patch221 -p1
 
 %build
 # print out system information
