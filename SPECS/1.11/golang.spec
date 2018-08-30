@@ -110,7 +110,7 @@
 
 Name:           golang
 Version:        MAJOR_MINOR_PATCH
-Release:        0%{?dist}
+Release:        1%{?dist}
 Summary:        The Go Programming Language
 # source tree includes several copies of Mark.Twain-Tom.Sawyer.txt under Public Domain
 License:        BSD and Public Domain
@@ -152,6 +152,9 @@ Patch220:       golang-1.11-disable-testobjfile-test.patch
 
 # Fix for flaky TestExtraFiles test https://github.com/golang/go/issues/25628
 Patch221:       golang-1.11-disable-testextrafiles-test.patch
+
+# Disable testSpliceReaderAtEOF that fails on CentOS 6 https://github.com/golang/go/issues/27355
+Patch222:       golang-1.11-disable-testsplicereaderateof-test.patch
 
 # Having documentation separate was broken
 Obsoletes:      %{name}-docs < 1.1-4
@@ -290,6 +293,8 @@ Requires:       %{name} = %{version}-%{release}
 %patch220 -p1
 
 %patch221 -p1
+
+%patch222 -p1
 
 %build
 # print out system information

@@ -1,0 +1,12 @@
+diff -urBN a/src/net/splice_test.go b/src/net/splice_test.go
+--- a/src/net/splice_test.go	2018-08-24 15:38:35.000000000 -0500
++++ b/src/net/splice_test.go	2018-08-29 19:52:41.582493089 -0500
+@@ -20,7 +20,7 @@
+ 	t.Run("multipleWrite", testSpliceMultipleWrite)
+ 	t.Run("big", testSpliceBig)
+ 	t.Run("honorsLimitedReader", testSpliceHonorsLimitedReader)
+-	t.Run("readerAtEOF", testSpliceReaderAtEOF)
++	//t.Run("readerAtEOF", testSpliceReaderAtEOF)
+ 	t.Run("issue25985", testSpliceIssue25985)
+ }
+ 
