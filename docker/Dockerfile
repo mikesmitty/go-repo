@@ -1,4 +1,4 @@
-FROM fedora:latest
+FROM fedora:28
 
 RUN yum -y --setopt="tsflags=nodocs" update && \
 	yum -y --setopt="tsflags=nodocs" install mock rpm-sign expect && \
@@ -16,6 +16,7 @@ COPY mock /etc/mock
 # create mock cache on external volume to speed up build
 RUN install -g mock -m 2775 -d /rpmbuild/cache/mock
 RUN echo "config_opts['cache_topdir'] = '/rpmbuild/cache/mock'" >> /etc/mock/site-defaults.cfg
+RUN echo "config_opts['use_nspawn'] = False" >> /etc/mock/site-defaults.cfg
 
 ADD ./build-rpm.sh /build-rpm.sh
 RUN chmod +x /build-rpm.sh
