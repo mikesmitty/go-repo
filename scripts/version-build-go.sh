@@ -205,10 +205,6 @@ buildTarget "epel" "6" "i386" || exit 2
 dockerBuildTarget "fedora" "29" "x86_64" || exit 2
 dockerBuildTarget "fedora" "29" "i386" || exit 2
 
-# Fedora 28
-dockerBuildTarget "fedora" "28" "x86_64" || exit 2
-dockerBuildTarget "fedora" "28" "i386" || exit 2
-
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
 #    gpg --detach-sign --armor $file
