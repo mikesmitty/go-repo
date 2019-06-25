@@ -217,9 +217,9 @@ fi
 
 # Upload to server
 if [ "$RELEASE" = "stable" ]; then
-    rsync -rltoP --delete $REPO_DIR/centos/ $UPLOAD_HOST/centos/
-    rsync -rltoP --delete $REPO_DIR/fedora/ $UPLOAD_HOST/fedora/
+    rsync -rltoP --delete-after $REPO_DIR/centos/ $UPLOAD_HOST/centos/
+    rsync -rltoP --delete-after $REPO_DIR/fedora/ $UPLOAD_HOST/fedora/
 elif [ "$RELEASE" = "unstable" ]; then
-    rsync -rltoP --delete $REPO_DIR/centos/ $UPLOAD_HOST/centos-unstable/
-    rsync -rltoP --delete $REPO_DIR/fedora/ $UPLOAD_HOST/fedora-unstable/
+    rsync -rltoP --delete-after $REPO_DIR/centos/ $UPLOAD_HOST/centos-unstable/
+    rsync -rltoP --delete-after $REPO_DIR/fedora/ $UPLOAD_HOST/fedora-unstable/
 fi
