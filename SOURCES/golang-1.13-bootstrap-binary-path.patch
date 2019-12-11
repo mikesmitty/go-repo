@@ -1,0 +1,62 @@
+diff -urBN a/src/cmd/dist/buildtool.go b/src/cmd/dist/buildtool.go
+--- a/src/cmd/dist/buildtool.go	2019-09-03 12:07:47.000000000 -0500
++++ b/src/cmd/dist/buildtool.go	2019-09-03 19:08:03.511003300 -0500
+@@ -182,11 +182,19 @@
+ 	defer os.Setenv("GOBIN", os.Getenv("GOBIN"))
+ 	os.Setenv("GOBIN", "")
+ 
++	hostos := os.Getenv("GOHOSTOS")
++	hostarch := os.Getenv("GOHOSTARCH")
++
+ 	os.Setenv("GOOS", "")
+ 	os.Setenv("GOHOSTOS", "")
+ 	os.Setenv("GOARCH", "")
+ 	os.Setenv("GOHOSTARCH", "")
+ 
++	bingopath := pathf("%s/bin/%s_%s/go", goroot_bootstrap, hostos, hostarch)
++	if _, err := os.Stat(bingopath); os.IsNotExist(err) {
++		bingopath = pathf("%s/bin/go", goroot_bootstrap)
++	}
++
+ 	// Run Go 1.4 to build binaries. Use -gcflags=-l to disable inlining to
+ 	// workaround bugs in Go 1.4's compiler. See discussion thread:
+ 	// https://groups.google.com/d/msg/golang-dev/Ss7mCKsvk8w/Gsq7VYI0AwAJ
+@@ -196,7 +204,7 @@
+ 	// only applies to the final cmd/go binary, but that's OK: if this is Go 1.10
+ 	// or later we don't need to disable inlining to work around bugs in the Go 1.4 compiler.
+ 	cmd := []string{
+-		pathf("%s/bin/go", goroot_bootstrap),
++		bingopath,
+ 		"install",
+ 		"-gcflags=-l",
+ 		"-tags=math_big_pure_go compiler_bootstrap",
+diff -urBN a/src/make.bash b/src/make.bash
+--- a/src/make.bash	2019-09-03 12:07:47.000000000 -0500
++++ b/src/make.bash	2019-09-03 19:18:39.117434425 -0500
+@@ -166,8 +166,15 @@
+ if $verbose; then
+ 	echo cmd/dist
+ fi
+-if [ ! -x "$GOROOT_BOOTSTRAP/bin/go" ]; then
+-	echo "ERROR: Cannot find $GOROOT_BOOTSTRAP/bin/go." >&2
++if [ -x "$GOROOT_BOOTSTRAP/bin/${GOHOSTOS}_${GOHOSTARCH}/go" ]; then
++	rm -f cmd/dist/dist
++	GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" "$GOROOT_BOOTSTRAP/bin/${GOHOSTOS}_${GOHOSTARCH}/go" build -o cmd/dist/dist ./cmd/dist
++elif [ -x "$GOROOT_BOOTSTRAP/bin/go" ]; then
++	rm -f cmd/dist/dist
++	GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
++else
++	echo "ERROR: Cannot find $GOROOT_BOOTSTRAP/bin/${GOHOSTOS}_${GOHOSTARCH}/go." >&2
++	echo "ERROR: or $GOROOT_BOOTSTRAP/bin/${GOHOSTOS}_${GOHOSTARCH}/go." >&2
+ 	echo "Set \$GOROOT_BOOTSTRAP to a working Go tree >= Go 1.4." >&2
+ 	exit 1
+ fi
+@@ -176,8 +183,6 @@
+ 	echo "Set \$GOROOT_BOOTSTRAP to a working Go tree >= Go 1.4." >&2
+ 	exit 1
+ fi
+-rm -f cmd/dist/dist
+-GOROOT="$GOROOT_BOOTSTRAP" GOOS="" GOARCH="" GO111MODULE=off "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
+ 
+ # -e doesn't propagate out of eval, so check success by hand.
+ eval $(./cmd/dist/dist env -p || echo FAIL=true)
