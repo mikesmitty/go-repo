@@ -41,7 +41,7 @@ MAJOR_MINOR="$(echo $MAJOR_MINOR_PATCH |egrep -o '[0-9]\.[0-9]+')"
 
 function getTarball {
     if [ ! -f $DOWNLOAD_DIR/$FILE_NAME ]; then
-        PKG_URL="$(curl -s https://golang.org/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
+        PKG_URL="https://golang.org$(curl -s https://golang.org/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
         if [ -z "$PKG_URL" ]; then
             echo Could not find tarball for version $BUILD_VERSION
             exit 1
@@ -202,8 +202,8 @@ buildTarget "epel" "6" "x86_64" || exit 2
 buildTarget "epel" "6" "i386" || exit 2
 
 # Fedora 29
-dockerBuildTarget "fedora" "29" "x86_64" || exit 2
-dockerBuildTarget "fedora" "29" "i386" || exit 2
+#dockerBuildTarget "fedora" "29" "x86_64" || exit 2
+#dockerBuildTarget "fedora" "29" "i386" || exit 2
 
 ## Sign the repos
 #for file in $(ls $REPO_DIR/*/*/repodata/repomd.xml); do
