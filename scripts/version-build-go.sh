@@ -197,10 +197,6 @@ cp -fv $BUILD_DIR/SRPMS/golang-$MAJOR_MINOR_PATCH-*.src.rpm "$DOCKER_MOUNT/"
 # CentOS 7
 buildTarget "epel" "7" "x86_64" || exit 2
 
-# CentOS 6
-buildTarget "epel" "6" "x86_64" || exit 2
-buildTarget "epel" "6" "i386" || exit 2
-
 # Fedora 29
 #dockerBuildTarget "fedora" "29" "x86_64" || exit 2
 #dockerBuildTarget "fedora" "29" "i386" || exit 2
