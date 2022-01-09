@@ -41,7 +41,7 @@ MAJOR_MINOR="$(echo $MAJOR_MINOR_PATCH |egrep -o '[0-9]\.[0-9]+')"
 
 function getTarball {
     if [ ! -f $DOWNLOAD_DIR/$FILE_NAME ]; then
-        PKG_URL="https://golang.org$(curl -s https://golang.org/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
+        PKG_URL="https://go.dev$(curl -s https://go.dev/dl/ |egrep -om1 "[^\">]+go${BUILD_VERSION}.src.tar.gz")"
         if [ -z "$PKG_URL" ]; then
             echo Could not find tarball for version $BUILD_VERSION
             exit 1
