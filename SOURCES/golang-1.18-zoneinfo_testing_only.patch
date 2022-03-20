@@ -1,0 +1,75 @@
+diff -urBN a/src/time/internal_test.go b/src/time/internal_test.go
+--- a/src/time/internal_test.go	2022-03-15 09:08:16.000000000 -0500
++++ b/src/time/internal_test.go	2022-03-15 21:42:51.800516425 -0500
+@@ -4,12 +4,17 @@
+ 
+ package time
+ 
++import "runtime"
++
+ func init() {
+ 	// force US/Pacific for time zone tests
+ 	ForceUSPacificForTesting()
+ }
+ 
+ func initTestingZone() {
++	forceZipFileForTesting(true)
++	defer forceZipFileForTesting(false)
++
+ 	z, err := loadLocation("America/Los_Angeles", zoneSources[len(zoneSources)-1:])
+ 	if err != nil {
+ 		panic("cannot load America/Los_Angeles for testing: " + err.Error() + "; you may want to use -tags=timetzdata")
+@@ -21,8 +26,9 @@
+ var OrigZoneSources = zoneSources
+ 
+ func forceZipFileForTesting(zipOnly bool) {
+-	zoneSources = make([]string, len(OrigZoneSources))
++	zoneSources = make([]string, len(OrigZoneSources)+1)
+ 	copy(zoneSources, OrigZoneSources)
++	zoneSources = append(zoneSources, runtime.GOROOT()+"/lib/time/zoneinfo.zip")
+ 	if zipOnly {
+ 		zoneSources = zoneSources[len(zoneSources)-1:]
+ 	}
+diff -urBN a/src/time/zoneinfo_test.go b/src/time/zoneinfo_test.go
+--- a/src/time/zoneinfo_test.go	2022-03-15 09:08:16.000000000 -0500
++++ b/src/time/zoneinfo_test.go	2022-03-15 21:44:28.886591114 -0500
+@@ -9,6 +9,7 @@
+ 	"fmt"
+ 	"os"
+ 	"reflect"
++	"runtime"
+ 	"testing"
+ 	"time"
+ )
+@@ -137,7 +138,7 @@
+ 		t.Fatal(err)
+ 	}
+ 
+-	tzinfo, err := time.LoadTzinfo(locationName, time.OrigZoneSources[len(time.OrigZoneSources)-1])
++	tzinfo, err := time.LoadTzinfo(locationName, runtime.GOROOT()+"/lib/time/zoneinfo.zip")
+ 	if err != nil {
+ 		t.Fatal(err)
+ 	}
+diff -urBN a/src/time/zoneinfo_unix.go b/src/time/zoneinfo_unix.go
+--- a/src/time/zoneinfo_unix.go	2022-03-15 09:08:16.000000000 -0500
++++ b/src/time/zoneinfo_unix.go	2022-03-15 21:45:16.519650307 -0500
+@@ -11,10 +11,7 @@
+ 
+ package time
+ 
+-import (
+-	"runtime"
+-	"syscall"
+-)
++import "syscall"
+ 
+ // Many systems use /usr/share/zoneinfo, Solaris 2 has
+ // /usr/share/lib/zoneinfo, IRIX 6 has /usr/lib/locale/TZ.
+@@ -22,7 +19,6 @@
+ 	"/usr/share/zoneinfo/",
+ 	"/usr/share/lib/zoneinfo/",
+ 	"/usr/lib/locale/TZ/",
+-	runtime.GOROOT() + "/lib/time/zoneinfo.zip",
+ }
+ 
+ func initLocal() {
