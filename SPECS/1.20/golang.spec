@@ -143,7 +143,7 @@ Requires:       %{name}-bin = %{version}-%{release}
 Requires:       %{name}-src = %{version}-%{release}
 
 Patch2:       0002-syscall-expose-IfInfomsg.X__ifi_pad-on-s390x.patch
-Patch3:       0003-cmd-go-disable-Google-s-proxy-and-sumdb.patch
+#Patch3:       0003-cmd-go-disable-Google-s-proxy-and-sumdb.patch
 Patch4:       0004-cmd-link-use-gold-on-ARM-ARM64-only-if-gold-is-avail.patch
 
 # Having documentation separate was broken
